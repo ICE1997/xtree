@@ -53,12 +53,12 @@ func TestFromList(t *testing.T) {
 		}},
 	}
 
-	// Call the FromList function
-	tree := FromList(nodes)
+	// Call the Build function
+	tree := Build(nodes)
 
 	// Check if the result matches the expected tree
 	if !reflect.DeepEqual(tree, expectedTree) {
-		t.Errorf("FromList() returned incorrect result, expected: %v, got: %v", expectedTree, tree)
+		t.Errorf("Build() returned incorrect result, expected: %v, got: %v", expectedTree, tree)
 	}
 }
 
@@ -84,12 +84,12 @@ func TestToListBFS(t *testing.T) {
 		{Id: 5, ParentId: 3},
 	}
 
-	// Call the ToListBFS function
-	list := ToListBFS(treeNodes)
+	// Call the flatBFS function
+	list := flatBFS(treeNodes)
 
 	// Check if the result matches the expected tree
 	if !reflect.DeepEqual(list, expectedList) {
-		t.Errorf("ToListBFS() returned incorrect result, expected: %v, got: %v", expectedList, list)
+		t.Errorf("flatBFS() returned incorrect result, expected: %v, got: %v", expectedList, list)
 	}
 }
 
@@ -115,11 +115,11 @@ func TestToListDFS(t *testing.T) {
 		{Id: 5, ParentId: 3},
 	}
 
-	// Call the ToListDFS function
-	list := ToListDFS(treeNodes)
+	// Call the flatDFS function
+	list := flatDFS(treeNodes)
 
 	// Check if the result matches the expected tree
 	if !reflect.DeepEqual(list, expectedList) {
-		t.Errorf("ToListDFS() returned incorrect result, expected: %v, got: %v", expectedList, list)
+		t.Errorf("flatDFS() returned incorrect result, expected: %v, got: %v", expectedList, list)
 	}
 }

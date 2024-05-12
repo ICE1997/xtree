@@ -7,20 +7,29 @@ type XNode interface {
 	GetChildren() any
 }
 
-func FromList[T XNode](nodes []T) []T {
-	nodeMap := map[any]T{}
+func Build[T XNode](nodes []T) []T {
+	var treeNodes = []T{}
 
-	for _, node := range nodes {
-		nodeMap[node.GetId()] = node
+	if len(nodes) == 0 {
+		return treeNodes
 	}
 
-	var treeNodes []T
+	nodeMap := map[any]T{}
 	for _, node := range nodes {
-		if node.GetParentId() != nil {
-			if n, ok := nodeMap[node.GetParentId()]; ok {
-				children := n.GetChildren()
-				children = append(children.([]T), node)
-				n.SetChildren(children)
+		id := node.GetId()
+		if id != nil {
+			nodeMap[id] = node
+		}
+	}
+
+	for _, node := range nodes {
+		parentId := node.GetParentId()
+		if parentId != nil {
+			if n, ok := nodeMap[parentId]; ok {
+				if children := n.GetChildren(); children != nil {
+					children = append(children.([]T), node)
+					n.SetChildren(children)
+				}
 			} else {
 				treeNodes = append(treeNodes, node)
 			}
@@ -32,14 +41,25 @@ func FromList[T XNode](nodes []T) []T {
 	return treeNodes
 }
 
-func ToListBFS[T XNode](treeNodes []T) []T {
-	var nodes []T
+func Flat[T XNode](treeNodes []T, dfs bool) []T {
+	if dfs {
+		return flatDFS(treeNodes)
+	}
+	return flatBFS(treeNodes)
+}
+
+func flatBFS[T XNode](treeNodes []T) []T {
+	var nodes = []T{}
 
 	for len(treeNodes) > 0 {
 		var shiftNode T
 		shiftNode, treeNodes = treeNodes[0], treeNodes[1:]
 
-		children := shiftNode.GetChildren().([]T)
+		var children []T
+		_children := shiftNode.GetChildren()
+		if _children != nil {
+			children = _children.([]T)
+		}
 		if len(children) > 0 {
 			treeNodes = append(treeNodes, children...)
 			shiftNode.SetChildren(nil)
@@ -51,14 +71,18 @@ func ToListBFS[T XNode](treeNodes []T) []T {
 	return nodes
 }
 
-func ToListDFS[T XNode](treeNodes []T) []T {
-	var nodes []T
+func flatDFS[T XNode](treeNodes []T) []T {
+	var nodes = []T{}
 
 	for len(treeNodes) > 0 {
 		var popNode T
 		popNode, treeNodes = treeNodes[len(treeNodes)-1], treeNodes[:len(treeNodes)-1]
 
-		children := popNode.GetChildren().([]T)
+		var children []T
+		_children := popNode.GetChildren()
+		if _children != nil {
+			children = _children.([]T)
+		}
 		if len(children) > 0 {
 			for i := len(children) - 1; i >= 0; i-- {
 				treeNodes = append(treeNodes, children[i])
