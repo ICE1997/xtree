@@ -95,3 +95,35 @@ func flatDFS[T XNode](treeNodes []T) []T {
 
 	return nodes
 }
+
+func Walk[T XNode](treeNodes []T, handler func(current T, parent *T)) {
+	var stack = []T{}
+	stack = append(stack, treeNodes...)
+
+	i := 0
+	for len(stack) > 0 {
+		var popNode T
+		popNode, stack = stack[0], stack[1:]
+
+		if handler != nil && i < len(treeNodes) {
+			handler(popNode, nil)
+		}
+
+		var children []T
+		_children := popNode.GetChildren()
+		if _children != nil {
+			children = _children.([]T)
+		}
+		if len(children) > 0 {
+			for j := len(children) - 1; j >= 0; j-- {
+				stack = append(stack, children[j])
+
+				if handler != nil {
+					handler(children[j], &popNode)
+				}
+			}
+		}
+
+		i++
+	}
+}
